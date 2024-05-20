@@ -4,65 +4,59 @@ from typing import List
 
 
 class Trie:
-    #208
-    def __init__(self, ch="", end=False):
-        self.ch = ch
-        self.end = end
-        self.children = [0 for _ in range(26)]
+    def __init__(self) -> None:
+        self.isEnd=False
+        self.children=[None for _ in range(26)]
 
-    def insert(self, word: str) -> None:
-        if (len(word) == 0):
-            self.end = True
-            return
-        index = ord(word[0]) - 97
-        if (self.children[index] == 0):
-            self.children[index] = Trie(word[0])
-        self.children[index].insert(word[1:])
-
-    def search(self, word: str) -> bool:
-        if (len(word) == 0):
-            if (self.end):
-                return True
-            else:
+    def insert(self,word):
+        node=self
+        for each in word:
+            idx=ord(each)-ord("a")
+            if node.children[idx] is None:
+                node.children[idx]=Trie()
+            node=node.children[idx]
+        node.isEnd=True
+    
+    def search(self,word):
+        node=self
+        for each in word:
+            idx=ord(each)-ord("a")
+            if(node.children[idx]==None):
                 return False
-        index = ord(word[0]) - 97
-        if (self.children[index] == 0):
-            return False
-        return self.children[index].search(word[1:])
-
-    def startsWith(self, prefix: str) -> bool:
-        if (len(prefix) == 0):
-            return True
-        index = ord(prefix[0]) - 97
-        if (self.children[index] == 0):
-            return False
-        return self.children[index].startsWith(prefix[1:])
-
-    def longestWordInsert(self,s)->bool:
-        index=ord(s[0])-97
-        if (len(s) == 1):
-            if(self.children[index]==0):
-                self.children[index] = Trie(s[0], True)
-            return True
-        else:
-            if (self.children[index] != 0):
-                return self.children[index].longestWordInsert(s[1:])
-            return False
-
+            node=node.children[idx]
+        return True
+    
+    def startsWith(self,prefix):
+        node=self
+        for each in prefix:
+            idx=ord(each)-ord("a")
+            if(node.isEnd==False):
+                return False
+            node=node.children[idx]
+        return True
+                
+    def canInsert(self,word):
+        node=self
+        for each in word:
+            if(not node):
+                return False
+            idx=ord(each)-ord("a")
+            node=node.children[idx]
+        self.insert(word)
+        return True
 
 class Solution:
     #720
     def longestWord(self, words: List[str]) -> str:
-        t=Trie()
-        ans=""
-        # default setting of python sort string: short string at first, if the length is same then follow the lexicographical order
+        trie=Trie()
         words.sort(key=lambda item:len(item))
+        ans=""
         for each in words:
-            if(t.longestWordInsert(each)):
-                if(len(each)>len(ans)):
+            if(trie.canInsert(each)):
+                if len(each)>len(ans):
                     ans=each
                 else:
-                    ans=max(each,ans)
+                    ans=max(ans,each)
         return ans
 
 
