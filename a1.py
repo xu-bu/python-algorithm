@@ -11,6 +11,8 @@ from math import gcd
 from sortedcontainers import SortedList
 from typing import List, Union, Optional
 import random
+import copy
+from math import inf
 
 
 class TreeNode:
@@ -32,44 +34,55 @@ class ListNode:
             p = p.next
 
 
-class Column:
-    def __init__(self):
-        pass
+class Trie:
+    def __init__(self) -> None:
+        self.children = [None for _ in range(2)]
+        self.end = False
+        self.HIGH_BITS = 30
+
+    def insert(self, num):
+        for i in reversed(range(self.HIGH_BITS)):
+            bit = (num>>i) & 1
+            if bit == 0:
+                if not self.children[0]:
+                    self.children[0] = Trie()
+                self = self.children[0]
+            else:
+                if not self.children[1]:
+                    self.children[1] = Trie()
+                self = self.children[1]
+        self.end = True
+
+    # def ifStartWith(self, num):
+    #     mask = pow(2, self.HIGH_BITS-1)
+    #     for i in range(self.HIGH_BITS):
+    #         bit = num & mask
+    #         if self.children[bit] == False:
+    #             return False
+    #         mask >>= 1
+    #     return True
 
 
 class Solution:
-    def minimumOperations(self, grid: List[List[int]]) -> int:
-        rows, cols = len(grid), len(grid[0])
-        pre = []
-        count = collections.Counter([grid[i][0] for i in range(rows)])
-        for i in range(10):
-            heapq.heappush(pre, (-count[i], i))
-        for i in range(1, cols):
-            cur = collections.Counter([grid[i][0] for i in range(rows)])
-            firstOps, firstNum = heapq.heappop(pre)
-            firstOps = -firstOps
-            for i in range(10):
-                if i == firstNum:
-                    firstOps, firstNum = heapq.heappop(pre)
-                    firstOps = -firstOps
-
-        return dp[cols - 1].bestOps
-
-
+    def minimumSumSubarray(self, nums: List[int], l: int, r: int) -> int:
+        n=len(nums)
+        start,end=0,l
+        total=sum(nums[:l])
+        ans=total if total>0 else float('inf')
+        while end+1<=n:
+            end+=1
+            total+=nums[end-1]
+            while total>0 and end-start>l:
+                total-=nums[start]
+                start+=1
+            if total>0:
+                ans=min(ans,total)
+            
+        return ans if type(ans)==int else -1
+                
+        
 if __name__ == "__main__":
     solution = Solution()
     nums = [2, 3, 0, 0, 2]
     k = 4
-    grid = [
-        [2, 4, 4, 3, 3, 6],
-        [5, 0, 3, 3, 1, 0],
-        [0, 4, 6, 1, 9, 0],
-        [5, 7, 7, 2, 1, 3],
-        [0, 6, 9, 8, 1, 2],
-        [9, 4, 2, 1, 7, 7],
-    ]
-    for each in grid:
-        for each2 in each:
-            print(each2, end=" ")
-        print()
-    print(solution.minimumOperations(grid))
+    print(solution.minimumSumSubarray([-12,8],1,1))
