@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional,List
 
 class ListNode:
     def __init__(self, val=0, next=None):
@@ -31,38 +31,28 @@ def createLinkedList(numbers):
 
 
 class Solution:
-    def reverseList(self, head: ListNode) -> ListNode:
-        if not head or not head.next:
-            return head
-        tail = head.next
-        newHead = self.reverseList(head.next)
-        tail.next = head
-        return newHead
-
-    def oddEvenList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        oddHead,evenHead=ListNode(),ListNode()
-        p=oddHead
-        q=evenHead
-        flag=True
-        while(head):
-            if(flag):
-                p.next=head
-                p=p.next
-                flag=False
-            else:
-                q.next=head
-                q=q.next
-                flag = True
-            head=head.next
-        p.next=evenHead.next
-        q.next=None
-        return oddHead.next
+    def modifiedList(self, nums: List[int], head: Optional[ListNode]) -> Optional[ListNode]:
+        dic={}
+        for num in nums:
+            dic[num]=True
+        while head.val in dic:
+            head = head.next
+        p1,p2=head,head.next
+        while p2!=None:
+            while p2.val in dic:
+                p2=p2.next
+                p1.next=p2
+                if not p2:
+                    return head
+            p1=p1.next
+            if not p1:
+                return head
+            p2=p1.next
+        return head
 
 if __name__ == '__main__':
-    head = [1, 2, 3, 4, 5]
+    head = [3,7,1,8,1]
     head = createLinkedList(head)
-
     s = Solution()
-
-    head=s.oddEvenList(head)
-    head.traverse()
+    ll=s.modifiedList([1,7,6,2,4],head)
+    ll.traverse()
