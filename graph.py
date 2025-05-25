@@ -2,73 +2,9 @@ import collections
 import functools
 from typing import List
 from heapq import *
+from math import *
 
 class Solution(object):
-    #200图中搜索岛屿数量
-    def numIslands(self, grid: list[list[str]]) -> int:
-        #dfs整体结构：
-        #dfs先写出口，对四个不同方向for循环，满足条件就开始搜索
-        #主函数两轮循环遍历，满足条件则开始搜索，搜完岛屿数量加一
-        rows, columns = len(grid), len(grid[0])
-        ans = 0
-
-        def dfs(i, j):
-            #递归出口，如果不是1，说明要么是0，没有岛屿，要么是.，已经被搜索过了
-            if grid[i][j] != '1':
-                return
-            grid[i][j] = '.'
-            for (x, y) in [(i + 1, j), (i - 1, j), (i, j - 1), (i, j + 1)]:
-                #不要用range去判断，很慢
-                if 0 <= x < rows and 0 <= y < columns:
-                    dfs(x, y)
-
-        for i in range(rows):
-            for j in range(columns):
-                if grid[i][j] == '1':
-                    #一轮搜索可以搜完一整个孤岛，再开启下一次搜索的时候已经是下一个岛了
-                    dfs(i, j)
-                    ans += 1
-        return ans
-
-    #210 bfs拓扑排序
-    def findOrder(self, numCourses, prerequisites):
-        degrees=[0 for _ in range(numCourses)]
-        dic=collections.defaultdict(list)
-        for pre,course in prerequisites:
-            degrees[course-1]+=1
-            dic[pre-1].append(course-1)
-        queue=collections.deque(key for key,val in enumerate(degrees) if val==0)
-        order=[]
-        while queue:
-            cur=queue.popleft()
-            order.append(cur)
-            for each in dic[cur]:
-                degrees[each]-=1
-                if(degrees[each]==0):
-                    queue.append(each)
-        return order if len(order)==numCourses else []
-
-    #2267
-    def hasValidPath(self, grid: list[list[str]]) -> bool:
-        columns, rows = len(grid[0]), len(grid)
-        if (columns + rows - 1) % 2 != 0 or grid[0][0] == ')' or grid[rows - 1][columns - 1] == '(':
-            return False
-
-        # condition记录平衡度，遇到左括号+1，遇到右括号-1，必须一直保持>=0
-        # dfs函数表示从x,y位置开始，能否完成找到一条成功的路径
-        @functools.cache
-        def dfs(x, y, condition):
-            # 路径长度是rows+columns-1,所以剩下的括号数量为rows+columns-1-x-y，c不能超过这个值
-            if condition < 0 or condition > rows + columns - 1 - x - y:
-                return False
-            condition += 1 if grid[x][y] == '(' else -1
-            if x == rows - 1 and y == columns - 1 and condition == 0:
-                return True
-            # 往左走完成，或者往右走完成
-            return (x + 1 < rows and dfs(x + 1, y, condition)) or (y + 1 < columns and dfs(x, y + 1, condition))
-
-        return dfs(0, 0, 0)
-    
     # 3387 dijkstra but multi to calculate cost and need to calculate both highCost and lowCost
     def maxAmount(self, initialCurrency: str, pairs1: List[List[str]], rates1: List[float], pairs2: List[List[str]], rates2: List[float]) -> float:
         # in dijkstra, we check neighbors, so need to store graph as {node: [(neighbor1, cost1), (neighbor2, cost2) ...]}
@@ -115,8 +51,43 @@ class Solution(object):
                 ans=max(ans,v/lowCost[k])
         return ans
 
-
-
+    # 3552 BFS
+    # 仅能向右向左移动的题目才能用dfs，这种上下左右都可以走的题目要用bfs
+    # BFS的思想是，模拟移动的过程中维护到每个点的最短距离表，有时可以用visited判断是否入队，本题使用距离判断
+    def minMoves(self, matrix: List[str]) -> int:
+        if matrix[-1][-1] == '#':
+            return -1
+        rows,cols= len(matrix), len(matrix[0])
+        # record portal
+        portal = collections.defaultdict(list)
+        for i in range(rows):
+            for j in range(cols):
+                if matrix[i][j].isupper():
+                    portal[matrix[i][j]].append((i,j))
+        # BFS
+        distanceGrid = [[inf]*cols for _ in range(rows)]
+        distanceGrid[0][0] = 0
+        queue = collections.deque([(0,0)])
+        DIR=[(0,1),(0,-1),(1,0),(-1,0)]
+        while queue:
+            i,j= queue.popleft()
+            curDistance=distanceGrid[i][j]
+            if i== rows-1 and j == cols-1:
+                return curDistance
+            c=matrix[i][j]
+            if c in portal:
+                for x,y in portal[c]:
+                    distanceGrid[x][y] = min(distanceGrid[x][y], curDistance)
+                    # must use portal first then normal move
+                    # since we don't need to move when transport and first cell could be portal 
+                    queue.appendleft((x,y))
+                del portal[c]
+            for [dx,dy] in DIR:
+                x,y = i+dx, j+dy
+                if 0<=x<rows and 0<=y<cols and matrix[x][y] != '#' and distanceGrid[x][y] > curDistance+1:
+                    distanceGrid[x][y] = curDistance+1
+                    queue.append((x,y))
+        return -1
 
 if __name__ == '__main__':
     n=8

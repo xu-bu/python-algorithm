@@ -27,7 +27,7 @@ class Heap:
             return returnitem
         return lastelt
 
-#使用heapify比一个一个地heappush效率高
+    #使用heapify比一个一个地heappush效率高
     def heapify(self):
         """Transform list into a heap, in-place, in O(len(x)) time."""
         n = len(self.heap)
@@ -70,7 +70,7 @@ class Heap:
         #不是很懂这里为什么还要再上浮一遍
         self.siftdown(startpos, pos)
         
-#剑指41 维护一个能输出中位数的列表
+# 295
 class MedianFinder:
     def __init__(self):
         """
@@ -128,15 +128,6 @@ class Solution:
             # 选择canProfit列表中收益最高的项目投资
             w -= heapq.heappop(canProfit)
         return w
-
-    #维护k个最大元素的堆的基本模板
-    def findKthLargest(self, nums: list[int], k: int) -> int:
-        minH = []
-        for each in nums:
-            heapq.heappush(minH, each)
-            if len(minH) > k:
-                heapq.heappop(minH)
-        return minH[0]
 
     #347 优先队列，带权值的堆
     def topKFrequent(self, nums, k):
