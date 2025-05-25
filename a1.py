@@ -4,17 +4,14 @@ from functools import *
 import heapq
 import itertools
 from heapq import *
-import math
+from math import *
 import string
 from decimal import Decimal
 from math import gcd
-from token import COLON
-
 from sortedcontainers import SortedList
 from typing import List, Union, Optional
 import random
 import copy
-from math import inf
 
 
 class TreeNode:
@@ -44,7 +41,7 @@ class Trie:
 
     def insert(self, num):
         for i in reversed(range(self.HIGH_BITS)):
-            bit = (num >> i) & 1
+            bit = (num>>i) & 1
             if bit == 0:
                 if not self.children[0]:
                     self.children[0] = Trie()
@@ -64,41 +61,29 @@ class Trie:
     #         mask >>= 1
     #     return True
 
-
 class Solution:
-    def minMoves(self, matrix: List[str]) -> int:
-        portalDic=collections.defaultdict(list)
-        rows,cols=len(matrix),len(matrix[0])
-        visited=[[False for _ in range(cols)] for _ in range(rows)]
-        for i in range(rows):
-            for j in range(cols):
-                c=matrix[i][j]
-                if c!='.' and c!='#':
-                    portalDic[c].append((i,j))
+    def maxProfit(self, n: int, present: List[int], future: List[int], hierarchy: List[List[int]], budget: int) -> int:
+        grid=[[]for _  in range(n)]
+        for [parent,child] in hierarchy:
+            grid[parent-1].append(child-1)
         @cache
-        def dfs(i,j,mask):
-            candidates=[]
-            visited[i][j]=True
-            for [x,y] in [[i+1,j],[i-1,j],[i,j+1],[i,j-1]]:
-                if 0<=x<rows and 0<=y<cols :
-                    if visited[x][y]:
-                        continue
-                    c = matrix[x][y]
-                    if c=='#':
-                        continue
-                    candidates.append(dfs(x,y,mask))
-                    if c!='.' and not mask&(1 >> (ord(c) - ord('A'))):
-                        mask = mask | (1 >> (ord(c) - ord('A')))
-                        candidates+=[dfs(px,py,mask) for [px,py] in portalDic[c]]
-            if len(candidates)==0:
-                return float('inf')
-            return 1+min(candidates)
-        return dfs(0,0,0)
-
-
-
+        def dfs(i, budget,isHalf):
+            choose,notChoose=0,0
+            if isHalf:
+                cost=present[i]//2
+            else:
+                cost =present[i]
+            if budget>=cost:
+                choose+=future[i]-cost
+                for child in grid[i]:
+                    choose+=dfs(child,budget-cost,True)
+            for child in grid[i]:
+                notChoose+=dfs(child,budget,False)
+            return max(choose,notChoose)
+        return dfs(0,budget,False)
+        
 if __name__ == "__main__":
     solution = Solution()
     nums = [2, 3, 0, 0, 2]
     k = 4
-    print(solution.minSwaps( [268835996,65052660,415128775]))
+    print(solution.maxProfit(3,[4,6,8],[7,9,11],[[1,2],[1,3]],10))
