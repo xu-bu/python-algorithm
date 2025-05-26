@@ -63,9 +63,11 @@ class Trie:
 
 class Solution:
     def maxProfit(self, n: int, present: List[int], future: List[int], hierarchy: List[List[int]], budget: int) -> int:
-        grid=[[]for _  in range(n)]
+        grid=[]
         for [parent,child] in hierarchy:
-            grid[parent-1].append(child-1)
+            if len(grid) <= parent:
+                grid.extend([[] for _ in range(parent - len(grid) + 1)])
+            grid[parent].append(child)
         @cache
         def dfs(i, budget,isHalf):
             choose,notChoose=0,0
@@ -73,12 +75,14 @@ class Solution:
                 cost=present[i]//2
             else:
                 cost =present[i]
-            if budget>=cost:
-                choose+=future[i]-cost
+            # need to calculate all max profit for this tree under every budgets
+            for j in range(budget+1):
+                if j>=cost:
+                    choose+=future[i]-cost
+                    for child in grid[i]:
+                        choose+=dfs(child,budget-cost,True)
                 for child in grid[i]:
-                    choose+=dfs(child,budget-cost,True)
-            for child in grid[i]:
-                notChoose+=dfs(child,budget,False)
+                    notChoose+=dfs(child,budget,False)
             return max(choose,notChoose)
         return dfs(0,budget,False)
         
@@ -86,4 +90,4 @@ if __name__ == "__main__":
     solution = Solution()
     nums = [2, 3, 0, 0, 2]
     k = 4
-    print(solution.maxProfit(3,[4,6,8],[7,9,11],[[1,2],[1,3]],10))
+    print(solution.minMoves(["A..",".A.","..."]))

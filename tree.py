@@ -109,12 +109,6 @@ def countNode(head):
         return countNode(head.left) + countNode(head.right) + 1
 
 
-# 检查以上算法时只考虑四种情况：
-# 1.没有子节点的叶子节点
-# 2.只有一个孩子节点的叶子节点
-# 3.有两个孩子节点的叶子节点
-# 4.任意二叉树的根节点
-
 def isFullBtree(head: TreeNode):
     if pow(2, countHeight(head)) - 1 == countNode(head):
         return True
