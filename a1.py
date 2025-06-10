@@ -70,7 +70,14 @@ class Solution:
             grid[parent].append(child)
         @cache
         def dfs(i, budget,isHalf):
+            childrenSize=len(grid[i])
+            if childrenSize==0:
+                if budget>=present[i]:
+                    return future[i] - present[i]// 2 if isHalf else future[i] - present[i]
+                else:
+                    return 0
             choose,notChoose=0,0
+            dp=[-inf] * (budget + 1)
             if isHalf:
                 cost=present[i]//2
             else:
@@ -79,7 +86,9 @@ class Solution:
             for j in range(budget+1):
                 if j>=cost:
                     choose+=future[i]-cost
-                    for child in grid[i]:
+                    for child in grid[i]:   
+                        if j>=present[child]:
+                            ans=max(dfs(child,j-present[child],True),dfs(i,j-present[child],True))
                         choose+=dfs(child,budget-cost,True)
                 for child in grid[i]:
                     notChoose+=dfs(child,budget,False)
