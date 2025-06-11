@@ -5,6 +5,52 @@ from heapq import *
 from math import *
 
 class Solution(object):
+    # 3548
+     # IF you need to deal with grid with all directions, you can just transpose/ reverse the grid then reuse function
+    def canPartitionGrid(self, grid: List[List[int]]) -> bool:
+        total = sum(sum(row) for row in grid)
+        # use this function to deal when cut by row
+        # when cut by column, just transpose the grid and call the same function
+
+        def isCutByRowWork(grid):
+            # use this function to check when subtracted elm is only from above
+            # when subtracted elm is from below, just reverse the grid and call the same function
+            def isCutFromAboveWork(grid):
+                rows, cols = len(grid), len(grid[0])
+                # traverse the grid and maintain componentSum and elmToSubtract set (of only elements from above)
+                # current traversing component's sum is componentSum
+                # if can cut, the rest component's sum will be componentSum-elmToSubtract
+                # since the sum of 2 components is total
+                # then we can check if 2*componentSum-total is in elmToSubtract
+                componentSum = 0
+                # 0 means no element is subtracted
+                elmToSubtract = {0}
+                for i, row in enumerate(grid):
+                    for j, elm in enumerate(row):
+                        componentSum += elm
+                        # only edging elm can be subtracted for first row
+                        if i > 0 or j == 0 or j == cols-1:
+                            elmToSubtract.add(elm)
+                    # special case if only one column
+                    if cols == 1:
+                        if 2*componentSum-total in set([grid[0][0], row[0],0]):
+                            return True
+                        else:
+                            continue
+                    # completed a row, add whole row back
+                    if i > 0:
+                        elmToSubtract.update(row)
+                    if 2*componentSum-total in elmToSubtract:
+                        return True
+                    # completed first row, add it back
+                    if i == 0:
+                        elmToSubtract.update(grid[0])
+                return False
+
+            return isCutFromAboveWork(grid) or isCutFromAboveWork(grid[::-1])
+
+        return isCutByRowWork(grid) or isCutByRowWork(list(zip(*grid)))
+   
     # 3387 dijkstra but multi to calculate cost and need to calculate both highCost and lowCost
     def maxAmount(self, initialCurrency: str, pairs1: List[List[str]], rates1: List[float], pairs2: List[List[str]], rates2: List[float]) -> float:
         # in dijkstra, we check neighbors, so need to store graph as {node: [(neighbor1, cost1), (neighbor2, cost2) ...]}
