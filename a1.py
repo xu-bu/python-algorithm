@@ -1,5 +1,5 @@
 import bisect
-import collections
+from collections import *
 from functools import *
 import heapq
 import itertools
@@ -41,7 +41,7 @@ class Trie:
 
     def insert(self, num):
         for i in reversed(range(self.HIGH_BITS)):
-            bit = (num>>i) & 1
+            bit = (num >> i) & 1
             if bit == 0:
                 if not self.children[0]:
                     self.children[0] = Trie()
@@ -61,42 +61,41 @@ class Trie:
     #         mask >>= 1
     #     return True
 
+
 class Solution:
-    def maxProfit(self, n: int, present: List[int], future: List[int], hierarchy: List[List[int]], budget: int) -> int:
-        grid=[]
-        for [parent,child] in hierarchy:
-            if len(grid) <= parent:
-                grid.extend([[] for _ in range(parent - len(grid) + 1)])
-            grid[parent].append(child)
-        @cache
-        def dfs(i, budget,isHalf):
-            childrenSize=len(grid[i])
-            if childrenSize==0:
-                if budget>=present[i]:
-                    return future[i] - present[i]// 2 if isHalf else future[i] - present[i]
-                else:
-                    return 0
-            choose,notChoose=0,0
-            dp=[-inf] * (budget + 1)
-            if isHalf:
-                cost=present[i]//2
+    def countPartitions(self, nums: List[int], k: int) -> int:
+        n=len(nums)
+        dp= [0] * n
+        preSum = [0] * n
+        dp[0]=1
+        preSum[0] = 1
+        maxDeque= deque([nums[0]])
+        minDeque= deque([nums[0]])
+        start=0
+        for i in range(1, n):
+            # keep the max and min at the left side of the deque
+            if  len(maxDeque)==0 or nums[i] >= maxDeque[-1]:
+                maxDeque.appendleft(nums[i])
             else:
-                cost =present[i]
-            # need to calculate all max profit for this tree under every budgets
-            for j in range(budget+1):
-                if j>=cost:
-                    choose+=future[i]-cost
-                    for child in grid[i]:   
-                        if j>=present[child]:
-                            ans=max(dfs(child,j-present[child],True),dfs(i,j-present[child],True))
-                        choose+=dfs(child,budget-cost,True)
-                for child in grid[i]:
-                    notChoose+=dfs(child,budget,False)
-            return max(choose,notChoose)
-        return dfs(0,budget,False)
+                maxDeque.append(nums[i])
+            if  len(minDeque)==0 or nums[i] <= minDeque[-1]:
+                minDeque.appendleft(nums[i])
+            else:
+                minDeque.append(nums[i])
+            
+            while len(maxDeque) and len(minDeque)  and maxDeque[-1] - minDeque[-1] >= k:
+                if nums[start] == maxDeque[0]:
+                    maxDeque.popleft()
+                if nums[start] == minDeque[0]:
+                    minDeque.popleft()
+                start += 1
+            dp[i] = (dp[i-1] + preSum[i-1])
+            preSum[i] = (preSum[i-1] + dp[i])
+        return dp[-1] % (10**9 + 7)
+            
         
 if __name__ == "__main__":
     solution = Solution()
-    nums = [2, 3, 0, 0, 2]
-    k = 4
-    print(solution.minMoves(["A..",".A.","..."]))
+    nums = [3,3,4]
+    k = 0
+    print(solution.countPartitions(nums, k)) 
