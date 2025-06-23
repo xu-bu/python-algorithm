@@ -1,5 +1,18 @@
 
-import collections
+import bisect
+from collections import *
+from functools import *
+import heapq
+import itertools
+from heapq import *
+from math import *
+import string
+from decimal import Decimal
+from math import gcd
+from sortedcontainers import SortedList
+from typing import List, Union, Optional
+import random
+import copy
 
 #239 维护能输出最大值的队列
 #这里实现的单调队列并不是把窗口中单调递减的值拿出来组成一个新队列，而是保证新入队的元素一直是单调队列中最小的值。同时这个队列没有维护窗口中的所有元素，因为没有必要
@@ -74,6 +87,40 @@ class Solution:
             monoQ.push(willPush)
             ans.append(monoQ.getMax())
         return ans
+
+    def countPartitions(self, nums: List[int], k: int) -> int:
+        n = len(nums)
+        # ans for nums[:i]
+        # dp[i+1]=sum(dp[start:i+1])
+        dp = [0] * (n+1)
+        # dp[0] should be 1 then we are able to calculate dp[1]=1
+        dp[0]=1
+        # sum of dp[start:i+1]
+        preSum=1
+        maxDeque = deque()
+        minDeque = deque()
+        start = 0
+        MOD= (10**9 + 7)
+        # i starts from 0 since we're calculating dp[i+1]
+        for i in range(n):
+            # keep the max and min at the start of the mono deque
+            while maxDeque and nums[i] > maxDeque[-1]:
+                maxDeque.pop()
+            maxDeque.append(nums[i])
+            while minDeque and nums[i] < minDeque[-1]:
+                minDeque.pop()
+            minDeque.append(nums[i])
+            while maxDeque and minDeque and maxDeque[0] - minDeque[0] > k:
+                if nums[start] == maxDeque[0]:
+                    maxDeque.popleft()
+                if nums[start] == minDeque[0]:
+                    minDeque.popleft()
+                preSum-= dp[start]
+                start += 1
+            dp[i+1] = (preSum) %MOD
+            preSum += dp[i+1]
+            preSum%= MOD
+        return dp[-1]
 
 if __name__ == '__main__':
     solution=Solution()
