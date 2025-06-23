@@ -6,7 +6,7 @@ from math import *
 
 class Solution(object):
     # 3548
-    # IF you need to deal with grid with all directions, you can just transpose/ reverse the grid then reuse function
+     # IF you need to deal with grid with all directions, you can just transpose/ reverse the grid then reuse function
     def canPartitionGrid(self, grid: List[List[int]]) -> bool:
         total = sum(sum(row) for row in grid)
         # use this function to deal when cut by row
@@ -50,8 +50,7 @@ class Solution(object):
             return isCutFromAboveWork(grid) or isCutFromAboveWork(grid[::-1])
 
         return isCutByRowWork(grid) or isCutByRowWork(list(zip(*grid)))
-
-
+   
     # 3387 dijkstra but multi to calculate cost and need to calculate both highCost and lowCost
     def maxAmount(self, initialCurrency: str, pairs1: List[List[str]], rates1: List[float], pairs2: List[List[str]], rates2: List[float]) -> float:
         # in dijkstra, we check neighbors, so need to store graph as {node: [(neighbor1, cost1), (neighbor2, cost2) ...]}
