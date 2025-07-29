@@ -81,43 +81,6 @@ class ListNode:
             p = p.next
 
 class Solution:
-    #502 IPO
-    #当给出一串输入数字，一个一个往列表中输入，同时还需要保证列表的顺序时，使用堆的效率很高
-    def findMaximizedCapital(self, k, w, profits, capital):
-        n = len(profits)
-        if w>=max(capital):
-            return sum(heapq.nlargest(k,profits))+w
-        arr=[(capital[i],profits[i]) for i in range(n)]
-        arr.sort(key=lambda x:x[0])
-        canProfit=[]
-        index = 0
-        for i in range(k):
-            while index < n and arr[index][0]<=w:
-                heapq.heappush(canProfit,-arr[index][1])
-                index+=1
-            if len(canProfit) == 0:
-                return w
-            # 选择canProfit列表中收益最高的项目投资
-            w -= heapq.heappop(canProfit)
-        return w
-
-    #347 优先队列，带权值的堆
-    def topKFrequent(self, nums, k):
-        """
-        :type nums: List[int]
-        :type k: int
-        :rtype: List[int]
-        """
-        count=collections.Counter(nums)
-        heap=[]
-        for key,val in count.items():
-            heapq.heappush(heap,(val,key))
-            if len(heap) > k:
-                heapq.heappop(heap)
-        #由于是带权值存储的，所以堆中的元素都是元组，所以这里要用[1]获取原本的数
-        #这样返回是无序的，不过这种题目一般也不要求结果有序
-        return [each[1] for each in heap]
-
     #23 优先队列处理链表
     def mergeKLists(self, lists: list[ListNode]) -> ListNode:
         heap = []

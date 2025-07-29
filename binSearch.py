@@ -15,9 +15,6 @@ def binSearch(MountainArray, l, r, target, key=lambda x: x):
             r = mid - 1
     return -1
 
-# TODO:可供降序数组使用的bisect
-
-
 # 查找递增数组中最接近指定数的数
 def getClose(arr, target):
     index = bisect.bisect_left(arr, target)

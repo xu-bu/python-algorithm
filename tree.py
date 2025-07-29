@@ -1,10 +1,17 @@
-import collections
-from queue import Queue
-from typing import Optional, List
+import bisect
+from collections import *
+from functools import *
+from heapq import *
+import itertools
+from heapq import *
+from math import *
 import string
-from itertools import chain
-
-
+from decimal import Decimal
+from math import gcd
+from sortedcontainers import SortedList
+from typing import List, Union, Optional
+import random
+import copy
 class TreeNode:
     val = 0
     left, right = None, None
@@ -322,13 +329,13 @@ class Solution:
         while visit[q.val] != 1:
             q = dic[q.val]
         return q
-
+    
 
 if __name__ == '__main__':
     edges = [[0, 1], [1, 2], [2, 3]]
     coins = [10, 10, 3, 3]
     k = 5
-    root = [1, 2, 3, 'null', 4]
+    root = [5,4,8,11,'null',13,4,7,2,'null','null',5,1]
     s = Solution()
     root = inputToTreeNode(root)
-    print(s.kthLargestPerfectSubtree(root, 3))
+    print(s.pathTarget(root, 22))
