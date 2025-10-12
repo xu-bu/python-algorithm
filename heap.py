@@ -1,7 +1,17 @@
 import bisect
-import collections
+from collections import *
+from functools import *
 import heapq
+import itertools
+from heapq import *
+from math import *
 import string
+from decimal import Decimal
+from math import gcd
+from sortedcontainers import SortedList
+from typing import List, Union, Optional
+import random
+import copy
 
 #涉及到一串数组慢慢输入，求过程中最值的问题，可以考虑堆排序
 #如果在海量数据中找出最大的100个数字，就适用于堆排序，因为如果数据量很大，使用其他的排序方法可能导致一个机器的内存不足以一次读取这么多数据
@@ -82,44 +92,42 @@ class ListNode:
 
 class Solution:
     #23 优先队列处理链表
-    def mergeKLists(self, lists: list[ListNode]) -> ListNode:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         heap = []
-        for i in range(len(lists)):
-            if lists[i]:
-                heapq.heappush(heap, (lists[i].val, i))
-        dummy = ListNode(0)
-        p = dummy
+        counter = 0
+        for p in lists:
+            while p:
+                # p will always be compared then it will throw since it's an object
+                # so we need to add a separator here
+                # since counter will always be unique, comparison will be finished after compare counter
+                heappush(heap, (p.val, counter, p))
+                p = p.next
+                counter += 1
+        head = heappop(heap)[2] if heap else None
+        last = head
         while heap:
-            val, index = heapq.heappop(heap)
-            p.next = ListNode(val)
-            p = p.next
-            if lists[index].next:
-                lists[index] = lists[index].next
-                heapq.heappush(heap, (lists[index].val, index))
-        return dummy.next
+            p = heappop(heap)[2]
+            last.next = p
+            last = p
 
+        return head
     #373
-    def kSmallestPairs(self, nums1, nums2, k):
-        """
-        :type nums1: List[int]
-        :type nums2: List[int]
-        :type k: int
-        :rtype: List[List[int]]
-        """
+    def kSmallestPairs(self, nums1: List[int], nums2: List[int], k: int) -> List[List[int]]:
+        n1,n2=len(nums1),len(nums2)
         heap=[]
-        #固定第一个元素是第一个数组中最小的数，遍历第二个数组，构造可能的最小数对
-        for each in [[0,i]for i in range(min(len(nums2),k))]:
-            heapq.heappush(heap,(nums1[each[0]]+nums2[each[1]],each[0],each[1]))
-        ans=[]
-        #弹出k次，每次都是弹出的最小的
-        while k>0 and len(heap)>0:
-            val,index1,index2=heapq.heappop(heap)
-            ans.append([nums1[index1],nums2[index2]])
-            #弹出最小的index1,index2之后，由于index2是被遍历过的，所以只用变index1，下一个可行的索引只能是index1+1,index2
-            if index1+1<len(nums1):
-                heapq.heappush(heap, (nums1[index1+1]+nums2[index2],index1+1 , index2))
-            k-=1
-        return ans
+        for j in range(n2):
+            for i in range(n1):
+                sum=nums1[i]+nums2[j]
+                # 剪枝
+                if heap and -heap[0][0]<=sum and len(heap)==k:
+                    if i==0:
+                        return [each[1:] for each in heap]
+                    else:
+                        break
+                heappush(heap,(-sum,nums1[i],nums2[j]))
+                if len(heap)>k:
+                    heappop(heap)
+        return [each[1:] for each in heap]
 
 if __name__ == '__main__':
     nums=[3,324,6,8,0,9]

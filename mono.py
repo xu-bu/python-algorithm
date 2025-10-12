@@ -88,6 +88,7 @@ class Solution:
             ans.append(monoQ.getMax())
         return ans
 
+    # 3578
     def countPartitions(self, nums: List[int], k: int) -> int:
         n = len(nums)
         # ans for nums[:i]
