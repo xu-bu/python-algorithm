@@ -1,3 +1,4 @@
-a=[{}]
-a+=[1,2,3]
-print(a)
+from collections import *
+
+a=deque(1)
+pr

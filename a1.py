@@ -1,18 +1,16 @@
 import bisect
 from collections import *
 from functools import *
-import heapq
-import itertools
 from heapq import *
 from math import *
 import string
 from decimal import Decimal
-from math import gcd
+from math import *
 from sortedcontainers import SortedList
 from typing import List, Union, Optional
 import random
 import copy
-
+from itertools import *
 
 class TreeNode:
     def __init__(self, val, left=None, right=None):
@@ -63,39 +61,21 @@ class Trie:
 
 
 class Solution:
-    def countPartitions(self, nums: List[int], k: int) -> int:
+    def maxValue(self, nums: List[int]) -> List[int]:
+        preMax,sufMin=list(accumulate(nums, max)) ,list(accumulate(nums[::-1], min))[::-1]
         n=len(nums)
-        dp= [0] * n
-        preSum = [0] * n
-        dp[0]=1
-        preSum[0] = 1
-        maxDeque= deque([nums[0]])
-        minDeque= deque([nums[0]])
-        start=0
-        for i in range(1, n):
-            # keep the max and min at the left side of the deque
-            if  len(maxDeque)==0 or nums[i] >= maxDeque[-1]:
-                maxDeque.appendleft(nums[i])
+        ans=[]
+        ans=[0]*n
+        ans[-1]=preMax[-1]
+        for i in range(n-2,-1,-1):
+            if preMax[i]>sufMin[i+1]:
+                ans[i]=ans[i+1]
             else:
-                maxDeque.append(nums[i])
-            if  len(minDeque)==0 or nums[i] <= minDeque[-1]:
-                minDeque.appendleft(nums[i])
-            else:
-                minDeque.append(nums[i])
-            
-            while len(maxDeque) and len(minDeque)  and maxDeque[-1] - minDeque[-1] >= k:
-                if nums[start] == maxDeque[0]:
-                    maxDeque.popleft()
-                if nums[start] == minDeque[0]:
-                    minDeque.popleft()
-                start += 1
-            dp[i] = (dp[i-1] + preSum[i-1])
-            preSum[i] = (preSum[i-1] + dp[i])
-        return dp[-1] % (10**9 + 7)
-            
-        
+                ans[i]=preMax[i]
+        return ans
+
 if __name__ == "__main__":
     solution = Solution()
-    nums = [3,3,4]
-    k = 0
-    print(solution.countPartitions(nums, k)) 
+    nums = [3,1,4,1,5]
+    k = 3
+    print(solution.maxValue([2,1,3]))
