@@ -1,4 +1,4 @@
-import bisect
+from bisect import *
 from collections import *
 from functools import *
 from heapq import *
@@ -11,6 +11,7 @@ from typing import List, Union, Optional
 import random
 import copy
 from itertools import *
+
 
 class TreeNode:
     def __init__(self, val, left=None, right=None):
@@ -61,21 +62,25 @@ class Trie:
 
 
 class Solution:
-    def maxValue(self, nums: List[int]) -> List[int]:
-        preMax,sufMin=list(accumulate(nums, max)) ,list(accumulate(nums[::-1], min))[::-1]
-        n=len(nums)
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if not root:
+            return []
+        level=[root]
         ans=[]
-        ans=[0]*n
-        ans[-1]=preMax[-1]
-        for i in range(n-2,-1,-1):
-            if preMax[i]>sufMin[i+1]:
-                ans[i]=ans[i+1]
-            else:
-                ans[i]=preMax[i]
+        while level:
+            ans.append([node.val for node in level])
+            nextLevel=[]
+            for node in level:
+                if node.left:
+                    nextLevel.append(node.left)
+                if node.right:
+                    nextLevel.append(node.right)
+            level=nextLevel
         return ans
+                
 
 if __name__ == "__main__":
     solution = Solution()
-    nums = [3,1,4,1,5]
-    k = 3
-    print(solution.maxValue([2,1,3]))
+    target = 11
+    nums = [1, 1, 1, 1, 1, 1, 1, 1]
+    print(solution.lengthOfLongestSubstring("dvdf"))

@@ -204,57 +204,7 @@ class Solution:
             return dp[start * n + end]
 
         return build(1, n)
-
-    # 98 bst的中序遍历序列一定是递增的
-    def isValidBST(self, root: TreeNode) -> bool:
-        ans = []
-
-        def inOrder(root):
-            if not root:
-                return
-            inOrder(root.left)
-            ans.append(root.val)
-            inOrder(root.right)
-
-        inOrder(root)
-        i = 1
-        while i < len(ans):
-            if ans[i] <= ans[i - 1]:
-                return False
-        return True
-
-    # 102
-    def levelOrder(self, root):
-        """
-        :type root: TreeNode
-        :rtype: List[List[int]]
-        """
-        if not root:
-            return []
-        queue = [root]
-        item = []
-        ans = []
-        index, cur, next, count, size = 0, 1, 0, 0, 1
-        while index < size:
-            node = queue[index]
-            item.append(node.val)
-            count += 1
-            if node.left:
-                queue.append(node.left)
-                next += 1
-                size += 1
-            if node.right:
-                queue.append(node.right)
-                next += 1
-                size += 1
-            # 这一步判断必须在循环的最后
-            if count == cur:
-                ans.append(item[:])
-                item = []
-                cur, next, count = next, 0, 0
-            index += 1
-        return ans
-
+    
     # 105 根据前序遍历和中序遍历恢复二叉树
     def buildTree(self, preorder: list[int], inorder: list[int]) -> TreeNode:
         dic = {}
