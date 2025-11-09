@@ -3,3 +3,4 @@
 /workspace.xml
 .history/
 .idea/
+/__pycache__/
