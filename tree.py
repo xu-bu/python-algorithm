@@ -229,58 +229,6 @@ class Solution:
 
         return myBuild(0, len(preorder), 0, len(inorder))
 
-    # 113 dfs遍历二叉树的所有路径
-    # 只不过是在前序遍历上加上了一个判断（访问叶子节点时把items放到ans中）和一个pop（）
-    # 然后有target的处理
-    def pathSum(self, root: [TreeNode], targetSum: int) -> list[list[int]]:
-        ans = []
-        items = []
-
-        def dfs(node, items, target):
-            if not node:
-                return
-            # visit部分
-            items.append(node.val)
-            # target是形参，能够隐形回溯，所以之后不用回溯target
-            target -= node.val
-            if not node.left and not node.right:
-                if target == 0:
-                    ans.append(items[:])
-
-            dfs(node.left, items, target)
-            dfs(node.right, items, target)
-            # 多加一个回溯
-            items.pop()
-
-        dfs(root, items, targetSum)
-        return ans
-
-    # 236 二叉树中找任意两个节点的最近公共祖先
-    # 首先遍历树，生成字典存储节点与其父节点的对应关系，然后从p节点出发去寻找根节点，标记路过的节点，最后从q节点出发回到根节点，当发现第一个被标记了的父节点时，即为ans
-    def lowestCommonAncestor(self, root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
-        dic = {}
-
-        def preOrder(root):
-            if not root:
-                return
-            if root.left:
-                dic[root.left.val] = root
-                preOrder(root.left)
-            if root.right:
-                dic[root.right.val] = root
-                preOrder(root.right)
-
-        preOrder(root)
-        visit = collections.defaultdict(int)
-        while p != root:
-            visit[p.val] = 1
-            p = dic[p.val]
-        visit[p.val] = 1
-        while visit[q.val] != 1:
-            q = dic[q.val]
-        return q
-    
-
 if __name__ == '__main__':
     edges = [[0, 1], [1, 2], [2, 3]]
     coins = [10, 10, 3, 3]
