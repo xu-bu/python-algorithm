@@ -62,25 +62,33 @@ class Trie:
 
 
 class Solution:
-    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
-        if not root:
-            return []
-        level=[root]
-        ans=[]
-        while level:
-            ans.append([node.val for node in level])
-            nextLevel=[]
-            for node in level:
-                if node.left:
-                    nextLevel.append(node.left)
-                if node.right:
-                    nextLevel.append(node.right)
-            level=nextLevel
-        return ans
-                
+    def totalScore(self, hp: int, damage: List[int], requirement: List[int]) -> int:
+        n = len(damage)
+        combineList = [damage[i] + requirement[i] for i in range(n)]
+        start, end = n - 1, n - 1
+        healthRequirement = 0
+        score = 0
+        while start >= 0:
+            if start == n - 1:
+                healthRequirement = combineList[start]
+            else:
+                healthRequirement = damage[start] + max(
+                    healthRequirement, requirement[start]
+                )
+            while hp < healthRequirement:
+                if end==0: return score
+                if requirement[end - 1] >= combineList[end]:
+                    end -= 1
+                else:
+                    healthRequirement -= combineList[end] - requirement[end - 1]
+                    end -= 1
+            score += max(end - start + 1, 0)
+            start -= 1
+        return score
+
 
 if __name__ == "__main__":
     solution = Solution()
     target = 11
     nums = [1, 1, 1, 1, 1, 1, 1, 1]
-    print(solution.lengthOfLongestSubstring("dvdf"))
+    print(solution.totalScore(2, [1,1], [1,1]))
