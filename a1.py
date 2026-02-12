@@ -11,6 +11,7 @@ from typing import List, Union, Optional
 import random
 import copy
 from itertools import *
+from operator import *
 
 
 class TreeNode:
@@ -62,33 +63,28 @@ class Trie:
 
 
 class Solution:
-    def totalScore(self, hp: int, damage: List[int], requirement: List[int]) -> int:
-        n = len(damage)
-        combineList = [damage[i] + requirement[i] for i in range(n)]
-        start, end = n - 1, n - 1
-        healthRequirement = 0
-        score = 0
-        while start >= 0:
-            if start == n - 1:
-                healthRequirement = combineList[start]
-            else:
-                healthRequirement = damage[start] + max(
-                    healthRequirement, requirement[start]
-                )
-            while hp < healthRequirement:
-                if end==0: return score
-                if requirement[end - 1] >= combineList[end]:
-                    end -= 1
-                else:
-                    healthRequirement -= combineList[end] - requirement[end - 1]
-                    end -= 1
-            score += max(end - start + 1, 0)
-            start -= 1
-        return score
+    def maxBalancedSubarray(self, nums: List[int]) -> int:
+        xorDict:dict[tuple[int],int] = {}
+        curXor = 0
+        ans = 0
+        oddEvenSum = 0
+        for end, num in enumerate(nums):
+            oddEvenSum +=1 if num % 2 == 0 else -1
+            curXor ^= num
+            if curXor == 0 and end % 2 == 1 and oddEvenSum == 0:
+                # maybe nums[:end+1] is a balanced subarray
+                ans = max(ans, end + 1)
+            if (curXor, -oddEvenSum) in xorDict:
+                start=xorDict[(curXor, -oddEvenSum)]
+                size = end - start+1
+                if size % 4 == 0 and oddEvenSum == 0:
+                    ans = max(ans, size)
+            if (curXor, oddEvenSum) not in xorDict:
+                xorDict[(curXor, oddEvenSum)] = end
+        return ans
 
 
 if __name__ == "__main__":
     solution = Solution()
     target = 11
-    nums = [1, 1, 1, 1, 1, 1, 1, 1]
-    print(solution.totalScore(2, [1,1], [1,1]))
+    print(solution.maxBalancedSubarray([3, 1, 3, 2, 0]))
