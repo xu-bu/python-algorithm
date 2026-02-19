@@ -1,4 +1,3 @@
-
 import bisect
 from collections import *
 from functools import *
@@ -18,7 +17,6 @@ import copy
 # keep max/min value when do window sliding
 # to know next greater/smaller element for each element
 class Solution:
-
     # 3578
     def countPartitions(self, nums: List[int], k: int) -> int:
         n = len(nums)
@@ -53,6 +51,28 @@ class Solution:
             preSum += dp[i+1]
             preSum%= MOD
         return dp[-1]
+    # 3835
+    def countSubarrays(self, nums: List[int], k: int) -> int:
+        maxDeque = deque()
+        minDeque = deque()
+        l = 0
+        ans = 0
+        for r, num in enumerate(nums):
+            while maxDeque and nums[maxDeque[-1]] < num:
+                maxDeque.pop()
+            maxDeque.append(r)
+            while minDeque and nums[minDeque[-1]] > num:
+                minDeque.pop()
+            minDeque.append(r)
+            while (nums[maxDeque[0]] - nums[minDeque[0]]) * (r - l + 1) > k:
+                l += 1
+                if maxDeque[0] < l:
+                    maxDeque.popleft()
+                if minDeque[0] < l:
+                    minDeque.popleft()
+            ans += r - l + 1
+        return ans
+
 
 if __name__ == '__main__':
     solution=Solution()
