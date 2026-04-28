@@ -119,7 +119,7 @@ class Solution:
 
     # 上一题的dp做法，把哈希表当作二维数组，存储build(start,end)的结果以供重复使用。dp[start*n+end]=build(start,end)
     def generateTreesDP(self, n):
-        dp = collections.defaultdict(list)
+        dp = defaultdict(list)
 
         def build(start, end):
             if start > end:

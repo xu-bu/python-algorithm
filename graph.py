@@ -1,12 +1,21 @@
-import collections
-import functools
-from typing import List
+from bisect import *
+from collections import *
+from functools import *
 from heapq import *
 from math import *
+import string
+from decimal import Decimal
+from math import *
+from sortedcontainers import SortedList
+from typing import List, Union, Optional
+import random
+import copy
+from itertools import *
+from operator import *
 
 class Solution(object):
     # 3548
-     # IF you need to deal with grid with all directions, you can just transpose/ reverse the grid then reuse function
+    # IF you need to deal with grid with all directions, you can just transpose/ reverse the grid then reuse function
     def canPartitionGrid(self, grid: List[List[int]]) -> bool:
         total = sum(sum(row) for row in grid)
         # use this function to deal when cut by row
@@ -50,7 +59,7 @@ class Solution(object):
             return isCutFromAboveWork(grid) or isCutFromAboveWork(grid[::-1])
 
         return isCutByRowWork(grid) or isCutByRowWork(list(zip(*grid)))
-   
+
     # 3387 dijkstra but multi to calculate cost and need to calculate both highCost and lowCost
     def maxAmount(self, initialCurrency: str, pairs1: List[List[str]], rates1: List[float], pairs2: List[List[str]], rates2: List[float]) -> float:
         # in dijkstra, we check neighbors, so need to store graph as {node: [(neighbor1, cost1), (neighbor2, cost2) ...]}
@@ -61,7 +70,7 @@ class Solution(object):
         for i,[currency1, currency2] in enumerate(pairs2):
             graph2[currency1].append([currency2,rates2[i]])
             graph2[currency2].append([currency1,1/rates2[i]])
-        
+
         # use dict then it's fine to use currency name rather than index
         highCost = {initialCurrency:1}
         # be careful when calculate highCost, initiate it as -1 rather than 1
@@ -77,7 +86,7 @@ class Solution(object):
                     highCost[nextCurrency] = curMoney*rate
                     heappush(heap, [-highCost[nextCurrency], nextCurrency])
             visited[curCurrency] = True
-        
+
         lowCost = {initialCurrency:1}
         heap=[(1,initialCurrency)]
         visited={}
@@ -90,7 +99,7 @@ class Solution(object):
                     lowCost[nextCurrency] = curMoney*rate
                     heappush(heap, [lowCost[nextCurrency], nextCurrency])
             visited[curCurrency] = True
-        
+
         ans=0
         for k,v in highCost.items():
             if k in lowCost:
@@ -125,7 +134,7 @@ class Solution(object):
                 for x,y in portal[c]:
                     distanceGrid[x][y] = min(distanceGrid[x][y], curDistance)
                     # must use portal first then normal move
-                    # since we don't need to move when transport and first cell could be portal 
+                    # since we don't need to move when transport and first cell could be portal
                     queue.appendleft((x,y))
                 del portal[c]
             for [dx,dy] in DIR:
@@ -134,6 +143,57 @@ class Solution(object):
                     distanceGrid[x][y] = curDistance+1
                     queue.append((x,y))
         return -1
+
+    # 207 topological sort
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        inDegree = [0] * numCourses
+        toDict = defaultdict(list)
+        toDelete = []
+        for [course, pre] in prerequisites:
+            inDegree[course] += 1
+            toDict[pre].append(course)
+        # initialize toDelete
+        for i in range(numCourses):
+            if inDegree[i] == 0:
+                toDelete.append(i)
+        while toDelete:
+            course = toDelete.pop()
+            for next_course in toDict[course]:
+                inDegree[next_course] -= 1
+                if inDegree[next_course] == 0:
+                    toDelete.append(next_course)
+        return sum(inDegree) == 0
+
+    # 310
+    # 度为1的点，以这些点为根产生的树绝对不可能是mht，因为只要用与它相邻的点为根，然后把它自身换成叶子节点，就能产生高度更矮的树
+    # then like topological sort, repeat this process
+    def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:
+        degree = [0] * n
+        adjacent = defaultdict(list)
+        for u, v in edges:
+            degree[u] += 1
+            degree[v] += 1
+            adjacent[u].append(v)
+            adjacent[v].append(u)
+        size = n
+        toDelete = []
+        for i in range(n):
+            if degree[i] == 1:
+                toDelete.append(i)
+        if len(toDelete) == 0:
+            return list(range(n))
+        while True:
+            nextToDelete = []
+            if size == len(toDelete):
+                return toDelete
+            for node in toDelete:
+                size -= 1
+                for neighbor in adjacent[node]:
+                    degree[neighbor] -= 1
+                    if degree[neighbor] == 1:
+                        nextToDelete.append(neighbor)
+            toDelete = nextToDelete
+
 
 if __name__ == '__main__':
     n=8
